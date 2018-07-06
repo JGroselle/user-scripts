@@ -1,0 +1,102 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+#
+# Archlinx personal package management script
+# Copyright (C) 2016 Julien Groselle <julien.groselle@gmail.com>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+#
+
+# Functions
+function usage() {
+  script_name=$(basename $0)
+  echo ""
+  echo "  $script_name usage:"
+  echo ""
+  echo "  Note: Do not use root user"
+  echo ""
+  echo "  $script_name -a       - All actions below"
+  echo "  $script_name -p       - Purge pacaur cache"
+  echo "  $script_name -u       - Upgrade entire system - AUR included"
+  echo "  $script_name -o       - Purge orphaned package"
+  echo "  $script_name -h       - Print this help"
+  echo ""
+  exit 3
+}
+
+function purge_pacaur_cache() {
+  shopt -s nullglob dotglob
+  local pacaur_cache_dir="${HOME}/.cache/pacaur"
+  local pacaur_cache_files=(${pacaur_cache_dir}/*)
+  if [ -d ${pacaur_cache_dir} ] ; then
+    if [ ${#pacaur_cache_files[@]} -gt 0 ] ; then
+      echo -n "Purging pacaur cache... "
+      rm -f -r --one-file-system ${pacaur_cache_dir}/*
+      [ ${?} -eq 0 ] && echo "done." || echo "failed."
+    else
+      echo "Pacaur cache empty."
+    fi
+  fi
+  shopt -u nullglob
+}
+
+function upgrade_system() {
+  echo "Upgrading entire system - AUR included"
+  pacaur -Syu
+}
+
+function purge_orphaned() {
+  if [ -n "$(pacman -Qtdq)" ] ; then
+    echo "Purging oprhaned..."
+    sudo pacman -Rns $(pacman -Qtdq)
+    [ ${?} -eq 0 ] && echo "done." || echo "failed."
+  else
+    echo "No orphan packages."
+  fi
+}
+
+# MAIN
+
+# Test user
+[ ${USER} == 'root' ] && usage
+
+# Test arguments existance
+[ "${#}" -eq 0 ] && usage
+
+while getopts ":hapou" opt; do
+  case ${opt} in
+    h)
+      usage
+    ;;
+    a)
+      purge_pacaur_cache
+      upgrade_system
+      purge_orphaned
+    ;;
+    p)
+      purge_pacaur_cache
+    ;;
+    o)
+      purge_orphaned
+    ;;
+    u)
+      upgrade_system
+    ;;
+    \?)
+      usage
+    ;;
+  esac
+done
