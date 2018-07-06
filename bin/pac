@@ -22,81 +22,88 @@ set -euo pipefail
 
 # Functions
 function usage() {
-  script_name=$(basename $0)
-  echo ""
-  echo "  $script_name usage:"
-  echo ""
-  echo "  Note: Do not use root user"
-  echo ""
-  echo "  $script_name -a       - All actions below"
-  echo "  $script_name -p       - Purge pacaur cache"
-  echo "  $script_name -u       - Upgrade entire system - AUR included"
-  echo "  $script_name -o       - Purge orphaned package"
-  echo "  $script_name -h       - Print this help"
-  echo ""
-  exit 3
+    script_name=$(basename "$0")
+    echo ""
+    echo "  $script_name usage:"
+    echo ""
+    echo "  Note: Do not use root user"
+    echo ""
+    echo "  $script_name -a       - All actions below"
+    echo "  $script_name -p       - Purge pacaur cache"
+    echo "  $script_name -u       - Upgrade entire system - AUR included"
+    echo "  $script_name -o       - Purge orphaned package"
+    echo "  $script_name -h       - Print this help"
+    echo ""
+    exit 3
 }
 
 function purge_pacaur_cache() {
-  shopt -s nullglob dotglob
-  local pacaur_cache_dir="${HOME}/.cache/pacaur"
-  local pacaur_cache_files=(${pacaur_cache_dir}/*)
-  if [ -d ${pacaur_cache_dir} ] ; then
-    if [ ${#pacaur_cache_files[@]} -gt 0 ] ; then
-      echo -n "Purging pacaur cache... "
-      rm -f -r --one-file-system ${pacaur_cache_dir}/*
-      [ ${?} -eq 0 ] && echo "done." || echo "failed."
-    else
-      echo "Pacaur cache empty."
+    shopt -s nullglob dotglob
+    local pacaur_cache_dir="${HOME}/.cache/pacaur"
+    local pacaur_cache_files=("${pacaur_cache_dir}"/*)
+    if [ -d "${pacaur_cache_dir}" ] ; then
+        if [ ${#pacaur_cache_files[@]} -gt 0 ] ; then
+            echo -n "Purging pacaur cache... "
+            if rm -f -r --one-file-system "${pacaur_cache_dir:?}"/* ; then
+                echo "done."
+            else
+                echo "failed."
+            fi
+        else
+            echo "Pacaur cache empty."
+        fi
     fi
-  fi
   shopt -u nullglob
 }
 
 function upgrade_system() {
-  echo "Upgrading entire system - AUR included"
-  pacaur -Syu
+    echo "Upgrading entire system - AUR included"
+    pacaur -Syu
 }
 
 function purge_orphaned() {
-  if [ -n "$(pacman -Qtdq)" ] ; then
-    echo "Purging oprhaned..."
-    sudo pacman -Rns $(pacman -Qtdq)
-    [ ${?} -eq 0 ] && echo "done." || echo "failed."
-  else
-    echo "No orphan packages."
-  fi
+    if [ -n "$(pacman -Qtdq)" ] ; then
+        echo "Purging oprhaned..."
+        if sudo pacman -Rns "$(pacman -Qtdq)" ; then
+            echo "done."
+        else
+           echo "failed."
+        fi
+    else
+        echo "No orphan packages."
+    fi
 }
 
 # MAIN
 
 # Test user
-[ ${USER} == 'root' ] && usage
+[ "${USER}" == 'root' ] && usage
 
 # Test arguments existance
 [ "${#}" -eq 0 ] && usage
 
 while getopts ":hapou" opt; do
-  case ${opt} in
-    h)
-      usage
-    ;;
-    a)
-      purge_pacaur_cache
-      upgrade_system
-      purge_orphaned
-    ;;
-    p)
-      purge_pacaur_cache
-    ;;
-    o)
-      purge_orphaned
-    ;;
-    u)
-      upgrade_system
-    ;;
-    \?)
-      usage
-    ;;
-  esac
+    case ${opt} in
+        h)
+            usage
+        ;;
+        a)
+            purge_pacaur_cache
+            upgrade_system
+            purge_orphaned
+        ;;
+        p)
+            purge_pacaur_cache
+        ;;
+        o)
+            purge_orphaned
+        ;;
+        u)
+            upgrade_system
+        ;;
+        \?)
+            usage
+        ;;
+    esac
 done
+
