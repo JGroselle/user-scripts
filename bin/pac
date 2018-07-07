@@ -20,6 +20,14 @@ set -euo pipefail
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 #
 
+# Text formating variables
+# http://linuxcommand.org/lc3_adv_tput.php
+bold=$(tput bold)
+cyan=$(tput setaf 6)
+green=$(tput setaf 2)
+red=$(tput setaf 1)
+reset=$(tput sgr0)
+
 # Functions
 function usage() {
     script_name=$(basename "$0")
@@ -43,34 +51,34 @@ function purge_pacaur_cache() {
     local pacaur_cache_files=("${pacaur_cache_dir}"/*)
     if [ -d "${pacaur_cache_dir}" ] ; then
         if [ ${#pacaur_cache_files[@]} -gt 0 ] ; then
-            echo -n "Purging pacaur cache... "
+            echo -n "${bold}${cyan}-> Purging pacaur cache...${reset}"
             if rm -f -r --one-file-system "${pacaur_cache_dir:?}"/* ; then
-                echo "done."
+                echo "${bold}${green}done.${reset}"
             else
-                echo "failed."
+                echo "${bold}${red}failed.${reset}"
             fi
         else
-            echo "Pacaur cache empty."
+            echo "${bold}${green}Pacaur cache empty.${reset}"
         fi
     fi
   shopt -u nullglob
 }
 
 function upgrade_system() {
-    echo "Upgrading entire system - AUR included"
+    echo "${bold}${cyan}-> Upgrading entire system - AUR included${reset}"
     pacaur -Syu
 }
 
 function purge_orphaned() {
     if [ -n "$(pacman -Qtdq)" ] ; then
-        echo "Purging oprhaned..."
+        echo "${bold}${cyan}-> Purging oprhaned..."
         if sudo pacman -Rns "$(pacman -Qtdq)" ; then
-            echo "done."
+            echo "${bold}${green}done.${reset}"
         else
-           echo "failed."
+           echo "${bold}${red}failed.${reset}"
         fi
     else
-        echo "No orphan packages."
+        echo "${bold}${green}No orphan packages.${reset}"
     fi
 }
 
