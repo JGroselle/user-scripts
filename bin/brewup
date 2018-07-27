@@ -1,0 +1,116 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+#
+# Archlinx personal package management script
+# Copyright (C) 2016 Julien Groselle <julien.groselle@gmail.com>
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+#
+
+# Text formating variables
+# http://linuxcommand.org/lc3_adv_tput.php
+bold=$(tput bold)
+cyan=$(tput setaf 6)
+green=$(tput setaf 2)
+red=$(tput setaf 1)
+reset=$(tput sgr0)
+
+# Functions
+function usage() {
+    script_name=$(basename "$0")
+    echo ""
+    echo "  $script_name usage:"
+    echo ""
+    echo "  $script_name -a       - All actions below"
+    echo "  $script_name -u       - Update and upgrade"
+    echo "  $script_name -p       - Prune - remove dead symlinks"
+    echo "  $script_name -c       - Cleanup - remove older versions"
+    echo "  $script_name -d       - Doctor - System check"
+    echo "  $script_name -h       - Print this help"
+    echo ""
+    exit 3
+}
+
+function _upgrade() {
+    echo -n "${bold}${cyan}-> Upgrading brew${reset}"
+    if brew update ; then
+        if brew upgrade ; then
+            echo "${bold}${green}[ OK ]${reset}"
+        else
+            echo "${bold}${red}[ Failed ]${reset}"
+        fi
+    else
+        echo "${bold}${red}[ Failed ]${reset}"
+    fi
+}
+
+function _prune() {
+    echo -n "${bold}${cyan}-> Pruning brew${reset}"
+    if brew prune ; then
+        echo "${bold}${green}[ OK ]${reset}"
+    else
+        echo "${bold}${red}[ Failed ]${reset}"
+    fi
+}
+
+function _cleanup() {
+    echo -n "${bold}${cyan}-> Cleanup brew${reset}"
+    if brew cleanup ; then
+        echo "${bold}${green}[ OK ]${reset}"
+    else
+        echo "${bold}${red}[ Failed ]${reset}"
+    fi
+}
+
+function _doctor() {
+    echo -n "${bold}${cyan}-> Doctoring brew${reset}"
+    if brew doctor ; then
+        echo "${bold}${green}[ OK ]${reset}"
+    else
+        echo "${bold}${red}[ Failed ]${reset}"
+    fi
+}
+
+# MAIN
+
+# Test arguments existance
+[ "${#}" -eq 0 ] && usage
+
+while getopts ":haupcd" opt; do
+    case ${opt} in
+        h)
+            usage
+        ;;
+        a)
+            _upgrade ; _prune ; _cleanup ; _doctor
+        ;;
+        u)
+            _upgrade
+        ;;
+        p)
+            _prune
+        ;;
+        c)
+            _cleanup
+        ;;
+        d)
+            _doctor
+        ;;
+        \?)
+            usage
+        ;;
+    esac
+done
