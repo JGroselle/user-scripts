@@ -63,7 +63,7 @@ s_tmux work
 
 Script to maintain OSx system clean
 
-# Dependencies
+### Dependencies
 
 * homebrew
 
