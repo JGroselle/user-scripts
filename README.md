@@ -2,6 +2,7 @@
 
 Scripts list:
 * pac
+* s_tmux
 
 ## Getting started
 
@@ -36,3 +37,23 @@ pac -a      # do all actions
 pac -o      # remove orphan
 ```
 
+## s_tmux
+
+This script is a simple tmux session manager
+
+### Dependencies
+
+* tmux
+
+### Features
+
+* list tmux sessions
+* create new tmux session
+* attach to already existing sessions
+* manage session profile
+
+### Example
+
+```
+s_tmux work
+```

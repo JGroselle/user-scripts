@@ -1,0 +1,48 @@
+#!/bin/bash
+
+# Manage user
+{ [ "$USER" == "root" ] || [[ "${EUID}" -eq 0 ]] ; } && { echo "[ERR] Wrong user : $USER" && exit 2 ; }
+
+# Manage args
+TYPE="${1}"
+[ -z "${TYPE}" ] && { echo "[ERR] You MUST add a type" && exit 2 ; }
+
+# List sessions
+if [ "${TYPE}" == '-l' ] ; then
+  pgrep -a tmux
+  exit 0
+fi
+
+# The name of your primary tmux session
+SESSION="${USER}-${TYPE}"
+
+# If the session is already running, just attach to it.
+if tmux has-session -t "${SESSION}" 2> /dev/null ; then
+  echo "Session ${SESSION} already exists. Attaching."
+  sleep 1 ; tmux attach -t "${SESSION}"
+else
+  echo "Create new tmux session: ${SESSION}" ; sleep 1
+  tmux new-session -d -s "${SESSION}"  # Create a new session, named $SESSION, and detach from it
+fi
+
+case ${TYPE} in
+  'work')
+    # Local windows
+    tmux new-window -t "${SESSION}" -a -n Work1
+    tmux new-window -t "${SESSION}" -a -n Work2
+  ;;
+  'mariadb')
+    tmux new-window -t "${SESSION}" -a -n MDB LB 'ssh mariadblb'
+    tmux new-window -t "${SESSION}" -a -n MDB 01 'ssh mariadb1v'
+    tmux new-window -t "${SESSION}" -a -n MDB 02 'ssh mariadb2v'
+    tmux new-window -t "${SESSION}" -a -n MDB 03 'ssh mariadb3v'
+  ;;
+  'pgsql')
+    tmux new-window -t "${SESSION}" -a -n PG 01 'ssh postgresql01'
+    tmux new-window -t "${SESSION}" -a -n PG 02 'ssh postgresql02'
+  ;;
+esac
+
+# Finally attach
+tmux attach -t "${SESSION}"
+
