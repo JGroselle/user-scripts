@@ -3,6 +3,7 @@
 Scripts list:
 * pac
 * s_tmux
+* brewup
 
 ## Getting started
 
@@ -56,4 +57,25 @@ This script is a simple tmux session manager
 
 ```
 s_tmux work
+```
+
+## brewup
+
+Script to maintain OSx system clean
+
+# Dependencies
+
+* homebrew
+
+### Features
+
+* Update & upgrade brew managed packages
+* Prune brew dead symlink
+* Cleanup old packages
+* Run doctor
+
+### Example
+
+```
+brewup -a
 ```
