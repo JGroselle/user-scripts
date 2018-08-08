@@ -72,7 +72,8 @@ function upgrade_system() {
 function purge_orphaned() {
     if [ -n "$(pacman -Qtdq)" ] ; then
         echo "${bold}${cyan}-> Purging oprhaned..."
-        if sudo pacman -Rns "$(pacman -Qtdq)" ; then
+        # shellcheck disable=SC2046
+        if pacaur -Rns $(pacaur -Qtdq) ; then
             echo "${bold}${green}done.${reset}"
         else
            echo "${bold}${red}failed.${reset}"
