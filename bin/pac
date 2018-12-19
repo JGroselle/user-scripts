@@ -28,6 +28,11 @@ green=$(tput setaf 2)
 red=$(tput setaf 1)
 reset=$(tput sgr0)
 
+# Variables
+bin_upgrade="$(command -v pikaur)"
+cache_dir="${HOME}/.cache/pikaur"
+cache_files=("${cache_dir}"/*)
+
 # Functions
 function usage() {
     script_name=$(basename "$0")
@@ -66,14 +71,14 @@ function purge_pacaur_cache() {
 
 function upgrade_system() {
     echo "${bold}${cyan}-> Upgrading entire system - AUR included${reset}"
-    pacaur -Syu
+    ${bin_upgrade} -Syu
 }
 
 function purge_orphaned() {
     if [ -n "$(pacman -Qtdq)" ] ; then
         echo "${bold}${cyan}-> Purging oprhaned..."
         # shellcheck disable=SC2046
-        if pacaur -Rns $(pacaur -Qtdq) ; then
+        if ${bin_upgrade} -Rns $(${bin_upgrade} -Qtdq) ; then
             echo "${bold}${green}done.${reset}"
         else
            echo "${bold}${red}failed.${reset}"
