@@ -30,7 +30,7 @@ reset=$(tput sgr0)
 
 # Variables
 bin_upgrade="$(command -v pikaur)"
-cache_dir="${HOME}/.cache/pikaur"
+cache_dir="${HOME}/.cache/pikaur/pkg"
 cache_files=("${cache_dir}"/*)
 
 # Functions
