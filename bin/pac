@@ -42,7 +42,7 @@ function usage() {
     echo "  Note: Do not use root user"
     echo ""
     echo "  $script_name -a       - All actions below"
-    echo "  $script_name -p       - Purge pacaur cache"
+    echo "  $script_name -p       - Purge cache"
     echo "  $script_name -u       - Upgrade entire system - AUR included"
     echo "  $script_name -o       - Purge orphaned package"
     echo "  $script_name -h       - Print this help"
@@ -50,20 +50,18 @@ function usage() {
     exit 3
 }
 
-function purge_pacaur_cache() {
+function purge_cache() {
     shopt -s nullglob dotglob
-    local pacaur_cache_dir="${HOME}/.cache/pacaur"
-    local pacaur_cache_files=("${pacaur_cache_dir}"/*)
-    if [ -d "${pacaur_cache_dir}" ] ; then
-        if [ ${#pacaur_cache_files[@]} -gt 0 ] ; then
-            echo -n "${bold}${cyan}-> Purging pacaur cache...${reset}"
-            if rm -f -r --one-file-system "${pacaur_cache_dir:?}"/* ; then
+    if [ -d "${cache_dir}" ] ; then
+        if [ ${#cache_files[@]} -gt 0 ] ; then
+            echo -n "${bold}${cyan}-> Purging cache... ${reset}"
+            if rm -f -r --one-file-system "${cache_dir:?}"/* ; then
                 echo "${bold}${green}done.${reset}"
             else
                 echo "${bold}${red}failed.${reset}"
             fi
         else
-            echo "${bold}${green}Pacaur cache empty.${reset}"
+            echo "${bold}${green}Cache empty.${reset}"
         fi
     fi
   shopt -u nullglob
@@ -102,12 +100,12 @@ while getopts ":hapou" opt; do
             usage
         ;;
         a)
-            purge_pacaur_cache
+            purge_cache
             upgrade_system
             purge_orphaned
         ;;
         p)
-            purge_pacaur_cache
+            purge_cache
         ;;
         o)
             purge_orphaned
