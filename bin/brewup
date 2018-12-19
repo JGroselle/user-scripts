@@ -45,7 +45,7 @@ function usage() {
 }
 
 function _upgrade() {
-    echo -n "${bold}${cyan}-> Upgrading brew${reset}"
+    echo -n "${bold}${cyan}-> Upgrading brew: ${reset}"
     if brew update ; then
         if brew upgrade ; then
             echo "${bold}${green}[ OK ]${reset}"
@@ -58,7 +58,7 @@ function _upgrade() {
 }
 
 function _prune() {
-    echo -n "${bold}${cyan}-> Pruning brew${reset}"
+    echo -n "${bold}${cyan}-> Pruning brew: ${reset}"
     if brew prune ; then
         echo "${bold}${green}[ OK ]${reset}"
     else
@@ -67,7 +67,7 @@ function _prune() {
 }
 
 function _cleanup() {
-    echo -n "${bold}${cyan}-> Cleanup brew${reset}"
+    echo -n "${bold}${cyan}-> Cleanup brew: ${reset}"
     if brew cleanup ; then
         echo "${bold}${green}[ OK ]${reset}"
     else
@@ -76,7 +76,7 @@ function _cleanup() {
 }
 
 function _doctor() {
-    echo -n "${bold}${cyan}-> Doctoring brew${reset}"
+    echo -n "${bold}${cyan}-> Doctoring brew: ${reset}"
     if brew doctor ; then
         echo "${bold}${green}[ OK ]${reset}"
     else
