@@ -94,7 +94,7 @@ while getopts ":haupcd" opt; do
             _upgrade ; _cask_upgrade ; _cleanup ; _doctor
         ;;
         u)
-            _upgrade
+            _upgrade ; _cask_upgrade
         ;;
         p)
             _prune
