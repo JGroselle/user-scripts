@@ -55,6 +55,15 @@ function _upgrade() {
     fi
 }
 
+function _cask_upgrade() {
+  echo -n "${bold}${cyan}-> Upgrading brew cask: ${reset}"
+  if brew cask upgrade ; then
+    return 0
+  fi
+  echo "${bold}${red}[ Failed ]${reset}"
+  return 1
+}
+
 function _cleanup() {
     echo -n "${bold}${cyan}-> Cleanup brew: ${reset}"
     if brew cleanup ; then
@@ -82,10 +91,10 @@ while getopts ":haupcd" opt; do
             usage
         ;;
         a)
-            _upgrade ; _cleanup ; _doctor
+            _upgrade ; _cask_upgrade ; _cleanup ; _doctor
         ;;
         u)
-            _upgrade
+            _upgrade ; _cask_upgrade
         ;;
         p)
             _prune
